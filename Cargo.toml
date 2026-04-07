@@ -1,0 +1,11 @@
+[package]
+name = "zkprim"
+description = "A collection of cryptographic primitives for ZK SNARKs"
+readme = "README.md"
+license = "MIT"
+keywords = []
+categories = []
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
