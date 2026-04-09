@@ -1,11 +1,11 @@
 # zkprim
 
-A zero-knowledge primitive library built in Rust. `zkprim`` implements foundational cryptographic
+A zero-knowledge primitive library built in Rust. `zkprim` implements foundational cryptographic
 components used in ZK proving systems — field arithmetic, cryptographic hashing, and Merkle tree
 construction with proof generation and verification.
 
-This library is not a production prover. It is a focused systems programming artifact designed to
-demonstrate fluency in Rust and cryptographic primitives at the protocol layer.zkprim
+This library is not a production prover. It is a focused systems programming project designed to
+demonstrate fluency in Rust and cryptographic primitives at the protocol layer.
 
 ---
  
