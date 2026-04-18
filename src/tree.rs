@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use sha3::{Digest, Sha3_256};
 
 const HASH_LENGTH: usize = 32;
@@ -79,19 +78,67 @@ impl MerkleTree {
     }
 
     pub fn set(&mut self, leaf_index: usize, value: Hash) {
-        todo!()
+        let index = self.nodes.len() / 2 + leaf_index;
+
+        self.nodes[index] = value;
+
+        Self::set_recursively(&mut self.nodes, index);
+    }
+
+    fn set_recursively(nodes: &mut [Hash], index: usize) {
+        let Some(parent) = Self::index_of_parent(index) else {
+            return;
+        };
+
+        let sibling = Self::index_of_sibling(index).unwrap();
+        let is_left = index % 2 == 0;
+
+        if is_left {
+            nodes[parent] = concat(&nodes[index], &nodes[sibling]);
+        } else {
+            nodes[parent] = concat(&nodes[sibling], &nodes[index]);
+        }
+
+        Self::set_recursively(nodes, parent);
     }
 
     pub fn proof(&self, leaf_index: usize) -> MerkleProof {
-        todo!()
+        let index = self.nodes.len() / 2 + leaf_index;
+        let mut proof = vec![];
+        Self::proof_recursively(&mut proof, &self.nodes, index);
+
+        MerkleProof(proof)
+    }
+
+    fn proof_recursively(proof: &mut Vec<(bool, Hash)>, nodes: &[Hash], index: usize) {
+        let Some(parent) = Self::index_of_parent(index) else {
+            return;
+        };
+
+        let sibling = Self::index_of_sibling(index).unwrap();
+        let is_left = index % 2 == 0;
+
+        proof.push((is_left, nodes[sibling]));
+
+        Self::proof_recursively(proof, nodes, parent)
     }
 
     pub fn verify(proof: &MerkleProof, leaf_value: Hash) -> Hash {
-        todo!()
+        let mut hash = leaf_value;
+
+        for (is_left, sibling) in proof.0.iter() {
+            if *is_left {
+                hash = concat(&hash, sibling);
+            } else {
+                hash = concat(sibling, &hash);
+            }
+        }
+
+        hash
     }
 
     pub fn num_leaves(&self) -> usize {
-        todo!()
+        self.nodes.len() / 2
     }
 
     fn num_leaves_from_depth(depth: usize) -> usize {
@@ -264,7 +311,7 @@ mod tests {
         let proof = tree.proof(tree.num_leaves() / 2);
 
         let root = tree.root();
-        let verify_root = MerkleTree::verify(&proof, u32_to_hash(tree.num_leaves() as u32));
+        let verify_root = MerkleTree::verify(&proof, u32_to_hash(tree.num_leaves() as u32 / 2));
 
         assert_eq!(root, verify_root);
     }
