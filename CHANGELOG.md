@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `MerkleTree` struct backed by a 1-indexed, power-of-two-sized `Vec<Hash>`, representing a fixed-depth binary Merkle tree
+  using SHA3-256 as the hash function. The tree layout places the root at index 1 with children at `2i` and `2i+1`.
+
+- `MerkleProof` newtype wrapping `Vec<(bool, Hash)>`, where the `bool` indicates whether the current node is the left
+  child, determining sibling ordering during verification.
+
+- `MerkleTree::new(depth, initial_leaf_value)` with O(depth) initialization that exploits the uniform initial leaf value
+  to compute each layer's hash exactly once rather than rehashing every node.
+
+- `MerkleTree::set(leaf_index, value)` that writes a leaf and propagates updated parent hashes up to the root in O(depth)
+  time via `set_recursively`.
+
+- `MerkleTree::proof(leaf_index)` that collects the sibling hash at each level along the path from the target leaf to the
+  root, returning a `MerkleProof` suitable for non-interactive verification.
+
+- `MerkleTree::verify(proof, leaf_value)` that recomputes the root hash by folding the proof's sibling hashes over the
+  leaf value, enabling verification without access to the full tree.
+
+- `MerkleTree::num_leaves()` returning the number of leaves as `nodes.len() / 2`.
+
 - Fp struct, representing a finite field over the [Mersenne prime](https://en.wikipedia.org/wiki/Mersenne_prime) 2^61-1. A
 Mersenne prime was chosen for its [efficient modular reduction properties](https://hal.sorbonne-universite.fr/hal-02883333/file/BaDueprintversion.pdf)
 to be explored in the future.
