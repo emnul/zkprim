@@ -9,3 +9,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+const-hex = "1.18.1"
+sha3 = "0.11.0"
+test-case = "3.3.1"
